@@ -1,20 +1,21 @@
-// Chrome Extension stuff.
+// Global config & data.
 let mdm = {
     'searchTerm': ''
 }
 
 // Initialize.
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    console.log("Message received: ", message.action)
     if (message.action === "scrapeResults") {
         const results = scrapeData(); // Call your scraping function
         setTimeout(() => sendResponse({ data: results }), 0);
         // sendResponse({ data: results });
-        return true
+        // return true
     }
     
     if (message.action === "ping") {
         sendResponse({ status: "ready" });
-        return true
+        // return true
     }
     
     // Scrape Global variables.
@@ -22,14 +23,14 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         const globalData = scrapeGlobals();
         setTimeout(() => sendResponse({ data: globalData }), 0);
         // sendResponse({ data: globalData });
-        return true
+        // return true
     }
     return true; // Keep the message channel open for asynchronous response
 });
 
-
 // Your existing scraping functions...
 const scrapeData = () => {
+    console.log("scrapeData(): Scraping.")
     let domainsToIgnore = [
         "https://www.google.com",
         "https://www.google.ca",
@@ -72,6 +73,7 @@ const extractTags = (element) => {
 };
 
 const scrapeResults = ( links ) => {
+    console.log("scrapeResults(): Scraping %d results.", links.length )
     let index = 0
     
     return links.map(link => {
@@ -81,6 +83,7 @@ const scrapeResults = ( links ) => {
 }
 
 const scrapeResult = ( link, index ) => {
+    // console.log("scrapeResult(): Scraping result #%d...", index)
     let container = link.closest('[jsaction*="mouseover:pane"]');
 
     if ( ! container ) {
@@ -176,7 +179,6 @@ const scrapeResult = ( link, index ) => {
         let isTags = ! tmpDataToMatch.match(isTestimonialRegex)
         if (isTags) {
             tags = extractTags(tmpData)
-            // console.log('tagsz1: ', tags)
         }
     }
 
@@ -275,10 +277,48 @@ const scrapeGlobals = () => {
 
     return mdm
 }
+
+const addEventListeners = () => {
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach(mutation => {
+            mutation.addedNodes.forEach(node => {
+                if (node.nodeType !== 1) return;
+
+                // Check the node itself
+                if (node.classList.contains("fontBodyMedium")) {
+                    checkForExhaustedResults(node);
+                }
+
+                // Check any matching descendants
+                node.querySelectorAll?.(".fontBodyMedium").forEach(child => {
+                    checkForExhaustedResults(child);
+                });
+            });
+        });
+    });
+
+    const checkForExhaustedResults = (el) => {
+        const text = el.textContent.trim();
+        if (text.includes("You've reached the end of the list.")) {
+            console.log("Mutation Observer: End of list detected.");
+            scrapeData()
+            observer.disconnect()
+        }
+    };
+
+    console.log("addEventListeners(): Adding body observer.");
+    observer.observe(document.body, { childList: true, subtree: true });
+};
+
+
+
 const init = () => {
     // Banner.
     console.log("==[ 🗺️ Maps Data Miner by Client Coffee ]==");
     console.log("@clientcoffee | https://clientcoffee.com");
+
+    // Add Event Listeners.
+    addEventListeners();
 }
 
 init();

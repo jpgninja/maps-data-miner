@@ -28,6 +28,7 @@ const headers = [
 let mdm = {
     "filename": 'map-results.csv'
 }
+let bodyElement
 
 const domLoadHandler = async () => {
     scrapeButton = document.getElementById('scrapeButton');
@@ -36,6 +37,7 @@ const domLoadHandler = async () => {
     filenameInput = document.getElementById('filenameInput');
     downloadResultsSection = document.getElementById('downloadResultsSection');
     flashElement = document.getElementById('flash');
+    bodyElement = document.getElementsByTagName('body')[0];
    
     // Sanity check for needed elements.
     const popupIsMissingElements = !scrapeButton || !downloadCsvButton || !resultsTable || !filenameInput || !downloadResultsSection || !flashElement;    
@@ -48,28 +50,41 @@ const domLoadHandler = async () => {
 }
 
 const isTabScrapable = (tabs) => {
-    console.log( tabs )
     tab = tabs[0];
     const isScrapable = tab && tab.url && tab.url.includes("google") && tab.url.includes("maps/search");
     if ( ! isScrapable ) {
-        let linkElement = document.createElement('a');
-        flashElement.innerHTML = '';
-        linkElement.href = 'https://www.google.com/maps/search/';
-        linkElement.textContent = "Visit Google Maps";
-        linkElement.target = '_blank';
-        flashElement.appendChild(linkElement);
-
-        scrapeButton.style.display = 'none';
-        downloadCsvButton.style.display = 'none';
-        filenameInput.style.display = 'none';
+        disableScraperUI();
         return false;
     }
-
+    
     if ( isScrapable ) {
         initPopup(tab);
     }
 }
 
+const disableScraperUI = () => {
+    // Disable UI via CSS.
+    bodyElement.classList.add( 'disabled' )
+
+    // Empty flash Element.
+    flashElement.innerHTML = '';
+}
+
+const enableScraperUI = () => {
+    console.log("enableScraperUI(): Enabling UI.")
+    // Disable UI via CSS.
+    bodyElement.classList.remove( 'disabled' )
+
+    scrapeButton.disabled = false;
+    scrapeButton.classList.add('enabled');
+    scrapeButton.addEventListener('click', scrapeButtonHandler);
+
+    // Enable CSV Download button.
+    downloadCsvButton.addEventListener('click', downloadCsvButtonHandler);
+
+    // Empty flash Element.
+    flashElement.innerHTML = '';
+}
 
 const initPopup = async () => {
     console.log("initPopup(): Initiating Popup.");
@@ -78,12 +93,7 @@ const initPopup = async () => {
     pingFrontend()
 
     // Enable scrape button.
-    scrapeButton.disabled = false;
-    scrapeButton.classList.add('enabled');
-    scrapeButton.addEventListener('click', scrapeButtonHandler);
-
-    // Enable CSV Download button.
-    downloadCsvButton.addEventListener('click', downloadCsvButtonHandler);
+    enableScraperUI();
 }
 
 const scrapeButtonHandler = async () => {
@@ -273,13 +283,18 @@ const fillTable = (results) => {
 const pingFrontend = async () => {
     const [currentTab] = await chrome.tabs.query({ active: true, currentWindow: true });
     chrome.tabs.sendMessage(currentTab.id, { action: "ping" }, (response) => {
+        // Some sort of error was thrown.
+        if (chrome.runtime.lastError) {
+            console.error("pingFrontend(): Ping failed: ", chrome.runtime.lastError.message);
+        }
+
         if (response && response.status === "ready") {
-            start()
+            console.log("pingFrontend(): Listener ready.");
             return true
         } else {
-            console.error("Listener not ready, retrying...");
+            console.error("pingFrontend(): Listener not ready, retrying...");
             setTimeout(pingFrontend, 1000); // Retry after 1 second
-            return true
+            return false
         }
     });
 };
@@ -299,15 +314,20 @@ const start = () => {
     showScrapeResultsSection();
 
     chrome.tabs.sendMessage(tab.id, { action: "scrapeResults" }, (response) => {
+        // Some sort of error was thrown.
         if (chrome.runtime.lastError) {
             console.error("Message delivery failed: ", chrome.runtime.lastError.message);
-        } else {
-            if (response && response.data) {
-                saveResults(response.data);
-                fillTable(response.data);
-            } else {
-                console.error("No data received or response is undefined");
-            }
+        }
+
+        // We got data back.
+        if (response && response.data) {
+            saveResults(response.data);
+            fillTable(response.data);
+        }
+        
+        // No data received.
+        if ( ! response || ! response.data) {
+            console.error("No data received or response is undefined");
         }
     });
 }
@@ -349,7 +369,7 @@ const scrapeGlobals = async () => {
         // Encountered error.
         if (chrome.runtime.lastError) {
             console.error("Message delivery failed: ", chrome.runtime.lastError.message);
-            return false;
+            // return false;
         }
     
         // Got nothing back.
