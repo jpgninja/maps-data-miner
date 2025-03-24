@@ -1,0 +1,30 @@
+{
+    "manifest_version": 3,
+    "name": "Maps Data Miner",
+    "version": "1.0.4",
+    "description": "Maps Data Miner by Client Coffee",
+    "permissions": [
+      "activeTab",
+      "scripting",
+      "storage"
+    ],
+    "action": {
+      "default_popup": "popup.html",
+      "default_icon": {
+        "16": "map.png",
+        "48": "map.png",
+        "128": "map.png"
+      }
+    },
+    "content_scripts": [{
+      "matches": ["<all_urls>"],
+      "js": ["maps-data-miner.js"],
+      "run_at": "document_idle"
+    }],
+    "icons": {
+      "16": "map.png",
+      "48": "map.png",
+      "128": "map.png"
+    }
+  }
+  
