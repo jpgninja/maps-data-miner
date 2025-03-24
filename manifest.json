@@ -11,9 +11,9 @@
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
-      "16": "images/map.png",
-      "48": "images/map.png",
-      "128": "images/map.png"
+      "16": "images/map-25x25.png",
+      "48": "images/map-25x25.png",
+      "128": "images/map-25x25.png"
     }
   },
   "content_scripts": [
@@ -29,8 +29,8 @@
     }
   ],
   "icons": {
-    "16": "images/map.png",
-    "48": "images/map.png",
-    "128": "images/map.png"
+    "16": "images/map-25x25.png",
+    "48": "images/map-25x25.png",
+    "128": "images/map-25x25.png"
   }
 }
