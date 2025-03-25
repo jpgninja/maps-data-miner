@@ -253,7 +253,7 @@
 
         // Address.
         let addressRegex = /\d+ [\w\s]+(?:#\s*\d+|Suite\s*\d+|Apt\s*\d+)?/
-        let filterRegex = /\b(Closed|Open 24 hours|24 hours)|Open\b/g
+        let filterRegex = /\b(Closed|Open 24 hours|24 hours)|Open|Closes soon\b/g
         let addressMatch = containerText.match(addressRegex)
         if (addressMatch) {
             address = addressMatch[0]
@@ -263,6 +263,7 @@
             address = address.replace(/(\d+)(Open)/g, '$1').trim()
             address = address.replace(/(\w)(Open)/g, '$1').trim()
             address = address.replace(/(\w)(Closed)/g, '$1').trim()
+            address = address.replace(/(\w)(Closes soon)/g, '$1').trim()
         }
 
         // Industry.
