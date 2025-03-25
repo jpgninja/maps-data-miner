@@ -118,6 +118,13 @@ h4 a:hover {
   border-right-color: #fefefe;
 }
 
+/* Controls */
+#downloadCsvButton {
+  margin-left: 10px;
+}
+#filenameInput {
+  margin-left: 10px;
+}
 
 
 /* Disabled */
