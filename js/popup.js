@@ -46,6 +46,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 })
 
 
+/**
+ * Initializes DOM elements and performs a sanity check to ensure all required
+ * elements are present. Queries the current active tab to determine if the page
+ * is scrapable and sets up the necessary UI elements for interaction.
+ * If any essential elements are missing, an error is logged.
+ */
+
 const domLoadHandler = async () => {
     refreshDataButton = document.getElementById('refreshDataButton')
     downloadCsvButton = document.getElementById('downloadCsvButton')
@@ -83,7 +90,12 @@ const isTabScrapable = (tabs) => {
     }
 }
 
-
+/**
+ * Disables the popup UI for the scraper by adding the 'disabled' CSS class to the body and
+ * emptying the flash element.
+ *
+ * @returns {void}
+ */
 const disableScraperUI = () => {
     // Disable UI via CSS.
     bodyElement.classList.add('disabled')
@@ -91,6 +103,7 @@ const disableScraperUI = () => {
     // Empty flash Element.
     flashElement.innerHTML = ''
 }
+
 /**
  * Enables the popup UI for the scraper by removing the 'disabled' CSS class on the body,
  * enabling the scrape button, adding a click event listener to the scrape button, and
@@ -110,7 +123,6 @@ const enableScraperUI = () => {
     // Empty flash Element.
     flashElement.innerHTML = ''
 }
-
 
 /**
  * Initializes the popup by ensuring the frontend is ready and enabling the scraper UI.
@@ -206,6 +218,12 @@ const getFilename = () => {
     return filename
 }
 
+/**
+ * Saves a filename to the local storage.
+ *
+ * @param {string} filename - The filename to be saved.
+ * @returns {undefined} Nothing.
+ */
 const saveFilename = ( filename ) => {
     mdm.filename = filename
 }
@@ -411,7 +429,6 @@ const pingFrontend = async () => {
  *
  * Removes the 'hidden' class from the download results section element.
  */
-
 const showScrapeResultsSection = () => {
     downloadResultsSection.classList.remove('hidden')
     refreshDataButton.disabled = false
@@ -419,7 +436,6 @@ const showScrapeResultsSection = () => {
     refreshDataButton.classList.remove('hidden')
     refreshDataButton.addEventListener('click', refreshDataButtonHandler)
 }
-
 
 /**
  * Starts the scrape process.
@@ -460,6 +476,12 @@ const start = () => {
     })
 }
 
+/**
+ * Refreshes the global variables (search term) by scraping the global
+ * variables from the content script and updating the `mdm` object.
+ *
+ * @returns {undefined} Nothing.
+ */
 const refreshGlobalData = () => {
 
 }
@@ -472,7 +494,9 @@ const populateFilenameInput = () => {
     let filenameTmp = getFilename()
     console.log("populateFilenameInput(): Populating input with filename '%s'", filenameTmp, filenameInput)
     if (filenameTmp) {
-        filenameInput.value = filenameTmp // Set the value of the input field
+        // Set the value of the input field
+        // filenameInput.setAttribute('value', filenameTmp);
+        filenameInput.value = filenameTmp
     }
 }
 
@@ -499,7 +523,7 @@ const generateDefaultFilename = () => {
     console.log("generateDefaultFilename(): Generating default filename.")
     let filename = ''
     let globalSearchTermSet = mdm && mdm.searchTerm && mdm.searchTerm.length > 0
-    console.log( "generateDefaultFilename(): ", mdm.searchTerm)
+    // console.log( "generateDefaultFilename(): ", mdm.searchTerm)
     let searchTermSlug = globalSearchTermSet ? mdm.searchTerm : 'maps'
     let ds = getDatestamp()
 
