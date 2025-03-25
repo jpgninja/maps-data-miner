@@ -6,14 +6,23 @@
   "permissions": [
     "activeTab",
     "scripting",
-    "storage"
+    "storage",
+    "webNavigation",
+    "tabs"
   ],
+  "host_permissions": [
+    "*://www.google.com/maps/*",
+    "*://maps.google.com/*"
+  ],
+  "background": {
+    "service_worker": "js/background.js"
+  },
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
-      "16": "images/map-36x36.png",
-      "48": "images/map-36x36.png",
-      "128": "images/map-36x36.png"
+      "16": "images/map-16x16.png",
+      "48": "images/map-48x48.png",
+      "128": "images/map-128x128.png"
     }
   },
   "content_scripts": [
@@ -25,12 +34,12 @@
       "js": [
         "js/maps-data-miner.js"
       ],
-      "run_at": "document_idle"
+      "run_at": "document_start"
     }
   ],
   "icons": {
-    "16": "images/map-36x36.png",
-    "48": "images/map-36x36.png",
-    "128": "images/map-36x36.png"
+    "16": "images/map-16x16.png",
+    "48": "images/map-48x48.png",
+    "128": "images/map-128x128.png"
   }
 }

@@ -1,4 +1,4 @@
-# ![](images/map-36x36.png) Maps Data Miner
+# ![](images/map-48x48.png) Maps Data Miner
 
 An incredibly powerful _Google Maps_ scraper written by @jpgninja for [Client Coffee](https://clientcoffee.com).
 
@@ -12,6 +12,7 @@ An incredibly powerful _Google Maps_ scraper written by @jpgninja for [Client Co
 - Scrape additional info:
     - Wheelchair Access
     - Open/Closed
+- Proper icon sizing
 
 ## Release Log
 
