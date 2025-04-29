@@ -175,6 +175,7 @@
         let testimonial = ''
         let isTestimonialRegex = /^".*"$/g
         let wheelchairAccess = '' // @TODO: grab '.google-symbols' items then iterate and grab 'aria-label' attributes.
+        let tmpSplit = []
 
         // Scrape index.
         if (index) {
@@ -193,19 +194,39 @@
             scrapeResult.resultLink = resultLink
 
             // Place ID.
-            tmpData = resultLink.split('!19s')[1].split('?')[0] || ''
-            if (tmpData) {
-                scrapeResult.placeId = tmpData
-            }
+            // tmpData = resultLink.split('!19s')[1].split('?')[0] || ''
+            // if (tmpData) {
+            //     scrapeResult.placeId = tmpData
+            // }
 
+            // Place ID.
+            tmpSplit = resultLink.split('!19s')
+            placeId = (tmpSplit[1] || '').split('?')[0] || ''
+            if (placeId) {
+                scrapeResult.placeId = placeId
+            }
+            
             // Latitude.
-            latitude = resultLink.split('!3d')[1].split('!4d')[0] || ''
+            // latitude = resultLink.split('!3d')[1].split('!4d')[0] || ''
+            // if (latitude) {
+            //     scrapeResult.latitude = latitude
+            // }
+            // Latitude.
+            tmpSplit = resultLink.split('!3d')
+            latitude = (tmpSplit[1] || '').split('!4d')[0] || ''
             if (latitude) {
                 scrapeResult.latitude = latitude
             }
 
+            // // Longitude.
+            // longitude = resultLink.split('!4d')[1].split('!')[0] || ''
+            // if (longitude) {
+            //     scrapeResult.longitude = longitude
+            // }
+
             // Longitude.
-            longitude = resultLink.split('!4d')[1].split('!')[0] || ''
+            tmpSplit = resultLink.split('!4d')
+            longitude = (tmpSplit[1] || '').split('!')[0] || ''
             if (longitude) {
                 scrapeResult.longitude = longitude
             }
